@@ -1,0 +1,29 @@
+name: .NET 6.0
+on:
+  push:
+    #branches: [ main ]
+  #pull_request:
+    #branches: [ main ]
+
+jobs:
+  BuildAndTest:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '6.0.x'
+    - uses: cryptic-wizard/run-specflow-tests@v1.2.0
+      with:
+        test-assembly-path: BankCodeChallengeTest/bin/Release/net6.0
+        test-assembly-dll: BankCodeChallengeTest.dll
+        test-execution-json: TestExecution.json
+        output-html: BankCodeChallengeResults.html
+        framework: net6.0
+    - if: success() || failure()
+      uses: actions/upload-artifact@v2
+      with:
+        name: BankCodeChallengeTestResults
+        path: BankCodeChallengeResults.html

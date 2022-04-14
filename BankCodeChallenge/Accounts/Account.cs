@@ -9,7 +9,7 @@ namespace BankCodeChallenge.Accounts
 {
     public abstract class Account
     {
-        public double Balance { get; protected set; }
+        public double Balance { get; set; }
         public string Owner { get; private set; }
         public List<Transaction> Transactions { get; private set; }
         public abstract AccountType Type { get; }
@@ -30,16 +30,22 @@ namespace BankCodeChallenge.Accounts
         /// <returns> false if transaction denied </returns>
         public abstract bool IsValidTransaction(Transaction transaction);
 
-        protected void PerformTransaction(Transaction transaction)
+        /// <returns> false if transaction denied </returns>
+        public bool TryPerformTransaction(Transaction transaction)
         {
+            if (!IsValidTransaction(transaction))
+            {
+                return false;
+            }
+
             switch (transaction.Type)
             {
                 case TransactionType.Deposit:
                     Balance += transaction.Amount;
-                    break;
+                    return true;
                 case TransactionType.Withdrawal:
                     Balance -= transaction.Amount;
-                    break;
+                    return true;
                 case TransactionType.Transfer:
                     if (this == transaction.From)
                     {
@@ -49,7 +55,7 @@ namespace BankCodeChallenge.Accounts
                     {
                         Balance += transaction.Amount;
                     }
-                    break;
+                    return true;
                 default: throw new ArgumentOutOfRangeException(nameof(transaction.Type));
             }
         }
