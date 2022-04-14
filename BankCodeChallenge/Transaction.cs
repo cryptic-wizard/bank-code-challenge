@@ -49,7 +49,7 @@ namespace BankCodeChallenge
         {
             Transaction transaction = new Transaction
             {
-                Type = TransactionType.Deposit,
+                Type = TransactionType.Transfer,
                 Amount = amount,
                 From = from,
                 To = to,

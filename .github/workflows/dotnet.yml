@@ -22,6 +22,7 @@ jobs:
         test-execution-json: TestExecution.json
         output-html: BankCodeChallengeResults.html
         framework: net6.0
+        build-verbosity: minimal
     - if: success() || failure()
       uses: actions/upload-artifact@v2
       with:

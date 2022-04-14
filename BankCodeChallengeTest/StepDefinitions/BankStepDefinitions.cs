@@ -22,10 +22,10 @@ namespace BankCodeChallengeTest.StepDefinitions
             bank.Accounts.Add(new CheckingAccount(name));
         }
 
-        [Given("the bank has an investment account with owner (.*) of type (.*)")]
-        public void GivenTheBankHasAnInvestmentAccountWithOwnerXOfTypeY(string name, InvestmentAccount.InvestmentAccountType investmentType)
+        [Given("the bank has an (individual|corporate) investment account with owner (.*)")]
+        public void GivenTheBankHasAnInvestmentAccountWithOwnerXOfTypeY(InvestmentAccount.InvestmentAccountType type, string name)
         {
-            bank.Accounts.Add(new InvestmentAccount(name, investmentType));
+            bank.Accounts.Add(new InvestmentAccount(name, type));
         }
 
         [Given("user (.*) has a balance of (.*)")]
@@ -75,6 +75,33 @@ namespace BankCodeChallengeTest.StepDefinitions
             {
                 Transaction newTransaction = Transaction.CreateWithdrawal(amount, account);
                 transactionApproved = account.TryPerformTransaction(newTransaction);
+            }
+        }
+
+        [When(@"user (.*) makes a transfer of (.*) to user (.*)")]
+        public void WhenUserXMakesATransferOfYToUserZ(string from, double amount, string to)
+        {
+            Account fromAccount = bank.Accounts.Find(x => x.Owner == from);
+            Account toAccount = bank.Accounts.Find(x => x.Owner == to);
+
+            if (fromAccount == null)
+            {
+                Assert.Fail("User " + from + " was not found");
+            }
+            else if (toAccount == null)
+            {
+                Assert.Fail("User " + to + " was not found");
+            }
+            else
+            {
+                Transaction newTransaction = Transaction.CreateTransfer(amount, fromAccount, toAccount);
+                transactionApproved = fromAccount.IsValidTransaction(newTransaction);
+
+                if (transactionApproved)
+                {
+                    fromAccount.TryPerformTransaction(newTransaction);
+                    toAccount.TryPerformTransaction(newTransaction);
+                }
             }
         }
 
