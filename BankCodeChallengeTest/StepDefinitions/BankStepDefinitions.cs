@@ -6,7 +6,7 @@ namespace BankCodeChallengeTest.StepDefinitions
     [Binding]
     public sealed class BankStepDefinitions
     {
-        private Bank bank;
+        private Bank bank = new Bank("test");
         private bool transactionApproved = false;
 
         #region Given
@@ -31,7 +31,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [Given("user (.*) has a balance of (.*)")]
         public void GivenUserXHasABalanceOfY(string user, double balance)
         {
-            Account account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -49,7 +49,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [When(@"user (.*) makes a deposit of (.*)")]
         public void WhenUserXMakesADepositOfY(string user, double amount)
         {
-            Account account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -65,7 +65,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [When(@"user (.*) makes a withdrawal of (.*)")]
         public void WhenUserXMakesAWithdrawalOfY(string user, double amount)
         {
-            Account account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -81,8 +81,8 @@ namespace BankCodeChallengeTest.StepDefinitions
         [When(@"user (.*) makes a transfer of (.*) to user (.*)")]
         public void WhenUserXMakesATransferOfYToUserZ(string from, double amount, string to)
         {
-            Account fromAccount = bank.Accounts.Find(x => x.Owner == from);
-            Account toAccount = bank.Accounts.Find(x => x.Owner == to);
+            Account? fromAccount = bank.Accounts.Find(x => x.Owner == from);
+            Account? toAccount = bank.Accounts.Find(x => x.Owner == to);
 
             if (fromAccount == null)
             {
@@ -111,7 +111,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [Then(@"user (.*) has a balance of (.*)")]
         public void ThenUserXBalanceIsY(string user, double balance)
         {
-            Account account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {

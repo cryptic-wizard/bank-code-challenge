@@ -9,8 +9,8 @@ namespace BankCodeChallenge
 {
     public class Transaction
     {
-        public Account From { get; private set; }
-        public Account To { get; private set; }
+        public Account? From { get; private set; }
+        public Account? To { get; private set; }
         public TransactionType Type { get; private set; }
         public double Amount { get; private set; }
 
