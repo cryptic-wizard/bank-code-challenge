@@ -6,32 +6,36 @@ namespace BankCodeChallengeTest.StepDefinitions
     [Binding]
     public sealed class BankStepDefinitions
     {
-        private Bank bank = new Bank("test");
-        private bool transactionApproved = false;
+        private readonly BankFixture fixture;
+
+        public BankStepDefinitions(BankFixture fixture)
+        {
+            this.fixture = fixture;
+        }
 
         #region Given
         [Given("there is a bank named (.*)")]
         public void GivenThereIsABankNamedX(string name)
         {
-            bank = new Bank(name);
+            fixture.bank = new Bank(name);
         }
 
         [Given("the bank has a checking account with owner (.*)")]
         public void GivenTheBankHasACheckingAccountWithOwnerX(string name)
         {
-            bank.Accounts.Add(new CheckingAccount(name));
+            fixture.bank.Accounts.Add(new CheckingAccount(name));
         }
 
         [Given("the bank has an (individual|corporate) investment account with owner (.*)")]
         public void GivenTheBankHasAnInvestmentAccountWithOwnerXOfTypeY(InvestmentAccount.InvestmentAccountType type, string name)
         {
-            bank.Accounts.Add(new InvestmentAccount(name, type));
+            fixture.bank.Accounts.Add(new InvestmentAccount(name, type));
         }
 
         [Given("user (.*) has a balance of (.*)")]
         public void GivenUserXHasABalanceOfY(string user, double balance)
         {
-            Account? account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = fixture.bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -49,7 +53,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [When(@"user (.*) makes a deposit of (.*)")]
         public void WhenUserXMakesADepositOfY(string user, double amount)
         {
-            Account? account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = fixture.bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -58,14 +62,14 @@ namespace BankCodeChallengeTest.StepDefinitions
             else
             {
                 Transaction newTransaction = Transaction.CreateDeposit(amount, account);
-                transactionApproved = account.TryPerformTransaction(newTransaction);
+                fixture.transactionApproved = account.TryPerformTransaction(newTransaction);
             }
         }
 
         [When(@"user (.*) makes a withdrawal of (.*)")]
         public void WhenUserXMakesAWithdrawalOfY(string user, double amount)
         {
-            Account? account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = fixture.bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -74,15 +78,15 @@ namespace BankCodeChallengeTest.StepDefinitions
             else
             {
                 Transaction newTransaction = Transaction.CreateWithdrawal(amount, account);
-                transactionApproved = account.TryPerformTransaction(newTransaction);
+                fixture.transactionApproved = account.TryPerformTransaction(newTransaction);
             }
         }
 
         [When(@"user (.*) makes a transfer of (.*) to user (.*)")]
         public void WhenUserXMakesATransferOfYToUserZ(string from, double amount, string to)
         {
-            Account? fromAccount = bank.Accounts.Find(x => x.Owner == from);
-            Account? toAccount = bank.Accounts.Find(x => x.Owner == to);
+            Account? fromAccount = fixture.bank.Accounts.Find(x => x.Owner == from);
+            Account? toAccount = fixture.bank.Accounts.Find(x => x.Owner == to);
 
             if (fromAccount == null)
             {
@@ -95,9 +99,9 @@ namespace BankCodeChallengeTest.StepDefinitions
             else
             {
                 Transaction newTransaction = Transaction.CreateTransfer(amount, fromAccount, toAccount);
-                transactionApproved = fromAccount.IsValidTransaction(newTransaction);
+                fixture.transactionApproved = fromAccount.IsValidTransaction(newTransaction);
 
-                if (transactionApproved)
+                if (fixture.transactionApproved)
                 {
                     fromAccount.TryPerformTransaction(newTransaction);
                     toAccount.TryPerformTransaction(newTransaction);
@@ -111,7 +115,7 @@ namespace BankCodeChallengeTest.StepDefinitions
         [Then(@"user (.*) has a balance of (.*)")]
         public void ThenUserXBalanceIsY(string user, double balance)
         {
-            Account? account = bank.Accounts.Find(x => x.Owner == user);
+            Account? account = fixture.bank.Accounts.Find(x => x.Owner == user);
 
             if (account == null)
             {
@@ -137,7 +141,7 @@ namespace BankCodeChallengeTest.StepDefinitions
                 shouldBeApproved = false;
             }
 
-            Assert.AreEqual(shouldBeApproved, transactionApproved);
+            Assert.AreEqual(shouldBeApproved, fixture.transactionApproved);
         }
 
 
